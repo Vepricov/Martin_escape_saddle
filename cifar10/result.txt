@@ -1,0 +1,7 @@
+~~~~~~~~~~~ Run name new_soap ~~~~~~~~~~~
+f1: 0.09796110439181496+-0.0
+precision: 0.08832611089432663+-0.0
+recall: 0.1287+-0.0
+===================== Config =====================
+{'task': 'CIFAR10', 'seed': 0, 'model': 'resnet18', 'batch_size': 64, 'n_epoches_tune': 1, 'n_epoches': 1, 'tune_runs': 1, 'eval_runs': 1, 'momentum': 0.95, 'prec_momentum': 0.5, 'update_freq': 10, 'report_to': 'wandb', 'device_id': 2, 'augment': False, 'optimizer': 'new_soap', 'lr': 0.00035035727503158256, 'weight_decay': 1.1126108152382694e-06, 'loss_scale': 625.0, 'train_step': 625, 'val_step': 157, 'test_step': 157}
+==========================================

@@ -1,0 +1,18 @@
+{
+    "task": "CIFAR10",
+    "seed": 18,
+    "model": "resnet18",
+
+    "batch_size": 64,
+    "n_epoches_tune": 1,
+    "n_epoches": 1,
+
+    "tune_runs": 1,
+    "eval_runs": 1,
+
+    "momentum": 0.95,
+    "prec_momentum": 0.5,
+    "update_freq": 10,
+
+    "report_to": "wandb"
+}
