@@ -47,7 +47,7 @@ def train_one_epoch(model, train_loader, loss_fn, optimizer):
         outputs = model(inputs)
         labels = labels.long()
         loss = loss_fn(outputs, labels)
-        loss.backward()
+        loss.backward() 
         optimizer.step()
         running_loss += loss.item()
         preds = torch.argmax(outputs, dim=1)
