@@ -104,6 +104,10 @@ class DataTrainingArguments:
         default=18, 
         metadata={"help": "Random seed for data generation"}
     )
+    use_scaling: Optional[bool] = field(
+        default=False
+    )
+
 
     def __post_init__(self):
         if self.task_name is not None:
@@ -327,7 +331,7 @@ class TrainingArguments(TrainingArguments):
         default=0.95,
         metadata={"help": "Momentum for new soap"}
     )
-    precondition_frequency: Optional[int] = field(
+    update_freq: Optional[int] = field(
         default=1,
         metadata={"help": "Precondition frequency for new soap"}
     )

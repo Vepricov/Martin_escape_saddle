@@ -64,7 +64,7 @@ def tune_params(config, name=None, use_old_tune_params=True):
         for key in params.keys():
             config[key] = params[key]
     
-    config["lr"] = 1e-4
+    #config["lr"] = 1e-4
     return config
 
 args = parse_args()
@@ -75,7 +75,7 @@ config['augment'] = args.augment
 if "report_to" not in config.keys(): config["report_to"] = "none"
 
 # experiment_list = [
-#     "adam", "soap", "new_soap", "sgd"
+#     "adam", "soap", "new_soap", "sgd", "shampoo"
 # ]
 experiment_list = [
     "new_soap"
@@ -99,10 +99,10 @@ for optimizer_name in experiment_list:
             wandb.init(
                 project = "MARTIN_ESCAPE",
                 tags    = [f"CIFAR10 {config["model"]}"],
-                name    = run_name,
+                name    = f"[{run_name}] lr={config['lr']}, wd={config['weight_decay']}",
                 config  = config
             )
-        metrics[run_name] = run_optimization(config, metrics[run_name])  
+        metrics[run_name] = run_optimization(config, metrics[run_name])
         if config["report_to"] == "wandb": wandb.finish()
 
     print(f'~~~~~~~~~~~ Run name {run_name} ~~~~~~~~~~~')

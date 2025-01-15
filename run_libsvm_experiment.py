@@ -26,6 +26,7 @@ def main():
         raise ValueError(f"Wrong dataset name: {data_args.dataset_name}!")
     ################################## Wandb ###################################
     run_name = f"[{training_args.optimizer_name}] {data_args.task_name}"
+    if data_args.use_scaling == True: run_name += " scaling"
     # run_name = "[TEST]"
     training_args.output_dir = f"{training_args.output_dir}/{run_name}"
     training_args.benchmark_name = data_args.dataset_name

@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=1 python run_libsvm_experiment.py \
+CUDA_VISIBLE_DEVICES=7 python run_libsvm_experiment.py \
     --dataset_name libsvm \
     --task_name binary \
     --per_device_train_batch_size 1024 \

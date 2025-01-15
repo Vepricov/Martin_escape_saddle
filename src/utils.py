@@ -105,6 +105,12 @@ def libsvm_prepocess(data_args, model_args, training_args, device):
         y = y - 1
         warnings.warn("X is a sparse matrix, but we convert is to np.array :(")
         X = X.toarray()
+
+    if data_args.use_scaling:
+        for j in range(X.shape[1]):
+            a = np.random.uniform(-10, 10)
+            X[:, j] *= np.exp(a)    
+    
     X = torch.tensor(X, dtype=torch.float32)
     y = torch.tensor(y, dtype=X.dtype)
 

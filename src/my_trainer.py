@@ -8,11 +8,9 @@ def get_optimizer(model, training_args):
         optimizer = new_soap.NEW_SOAP(
             model.parameters(), 
             lr=training_args.learning_rate, 
-            beta=training_args.beta, 
+            momentum=training_args.beta, 
             weight_decay=training_args.weight_decay, 
-            precondition_frequency=training_args.precondition_frequency,
-            normalize_grads=False,
-            correct_bias=False
+            update_freq=training_args.update_freq,
         )
     elif training_args.optimizer_name == "soap":
         optimizer = soap.SOAP(model.parameters(), lr=training_args.learning_rate)

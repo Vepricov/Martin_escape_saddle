@@ -9,6 +9,7 @@ do
         --hidden_dim 10 \
         --learning_rate 5e-2 \
         --num_epochs 10 \
+        --use_scaling true \
         --optimizer_name $optimizer_name \
         --report_to wandb # none or wandb
 done
