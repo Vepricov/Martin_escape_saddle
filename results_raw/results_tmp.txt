@@ -1,0 +1,110 @@
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 0.9987684729064039+-0.0
+test_loss: 0.34305156022310257+-0.0
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_f1: 0.2446275168534492+-0.0
+test_precision: 0.22167981609042803+-0.0
+test_recall: 0.3047+-0.0
+test_loss: 1.7959144054315028+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 0.9987684729064039+-0.0
+test_loss: 0.34305156022310257+-0.0
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 0.9987684729064039+-0.0
+test_loss: 0.34305156022310257+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 0.9987684729064039+-0.0
+test_loss: 0.34305156022310257+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.46921182266009853+-0.0
+test_loss: 0.9150967299938202+-0.0
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 0.9975369458128078+-0.0
+test_loss: 0.3987109512090683+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.9642857142857143+-0.0
+test_loss: 0.42514372368653613+-0.0
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 0.9975369458128078+-0.0
+test_loss: 0.3987109512090683+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.9642857142857143+-0.0
+test_loss: 0.42514372368653613+-0.0
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 0.9987684729064039+-0.0
+test_loss: 0.3401122788588206+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.9642857142857143+-0.0
+test_loss: 0.38372713575760525+-0.0
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 0.9987684729064039+-0.0
+test_loss: 0.3401122788588206+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.9642857142857143+-0.0
+test_loss: 0.38372713575760525+-0.0
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 0.9987684729064039+-0.0
+test_loss: 0.3401122788588206+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.9642857142857143+-0.0
+test_loss: 0.38372713575760525+-0.0
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 0.9990147783251231+-0.0012066451934892512
+test_loss: 0.34060788999001185+-0.0013059884567710278
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.9570197044334975+-0.021721359137761687
+test_loss: 0.38922572235266367+-0.02670215233346871
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 0.9990147783251231+-0.0012066451934892512
+test_loss: 0.34060788999001185+-0.0013059884567710278
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.9570197044334975+-0.021721359137761687
+test_loss: 0.38922572235266367+-0.02670215233346871
+~~~~~~~~~~~ Run name adam ~~~~~~~~~~~
+test_accuracy: 1.0+-0.0
+test_loss: 0.3396546120444934+-0.0
+~~~~~~~~~~~ Run name adam_scaled ~~~~~~~~~~~
+test_accuracy: 0.9630541871921182+-0.0
+test_loss: 0.38993914673725766+-0.0

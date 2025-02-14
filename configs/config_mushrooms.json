@@ -1,0 +1,14 @@
+{
+    "task": "Mushrooms",
+    "seed": 18,
+    "model": "LinearClassifier",
+
+    "batch_size": 64,
+    "n_epoches_tune": 1,
+    "n_epoches": 10,
+
+    "tune_runs": 50,
+    "eval_runs": 1,
+
+    "report_to": "wandb"
+}
