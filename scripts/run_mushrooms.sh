@@ -1,13 +1,21 @@
 #!/usr/bin/env bash
 clear
-for optimizer_name in adam
+for optimizer in taia
 do
-    for scale in 0 1
+    for transform in "" "--scale"
     do
-        CUDA_VISIBLE_DEVICES=4 python ./src/run_experiment.py \
-            --config ./configs/config_mushrooms.json \
-            --optimizer_name $optimizer_name \
-            --scale $scale \
-            --use_old_tune_params 
+        CUDA_VISIBLE_DEVICES=7 python ./src/run_experiment.py \
+            --dataset mushrooms \
+            --eval_runs 1 \
+            --n_epoches 1 \
+            --tune_runs 40 \
+            --optimizer $optimizer \
+            --hidden_dim 10 \
+            $transform \
+            --no_bias \
+            --lmo frobenious \
+            --use_old_tune_params \
+            --momentum 0 \
+            --wandb # 
     done
 done

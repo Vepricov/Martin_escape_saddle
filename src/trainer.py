@@ -7,32 +7,47 @@ import wandb
 
 from collections import defaultdict
 
-def train_step(model, optimizer, dataloader, loss_fn, device, config, 
-               tuning=False, epoch=0, verbose=False):
+def train_step(model, optimizer, dataloader, loss_fn, device, args, 
+               tuning=False, epoch=0, verbose=False, train_config=None):
     model.train()
     total_loss = 0
     for t, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.type(torch.LongTensor).to(device)
         
-        optimizer.zero_grad()
-        preds = model(X).to(device)
-        losses = loss_fn(preds, y)
-        loss = losses.mean().to(device)
-        if config["report_to"] == "wandb" and not tuning:
-            wandb.log({"train_loss": loss.item(), "train_step" : config["train_step"]})
+        def closure():
+            if hasattr(closure, 'has_been_called') and closure.has_been_called:
+                # Don't zero_grad on subsequent calls to preserve computational graph
+                preds = model(X).to(device)
+                losses = loss_fn(preds, y)
+                loss = losses.mean().to(device)
+                loss.backward(retain_graph=True)
+                return loss
+            else:
+                optimizer.zero_grad()
+                preds = model(X).to(device)
+                losses = loss_fn(preds, y)
+                loss = losses.mean().to(device)
+                loss.backward(retain_graph=True)
+                closure.has_been_called = True
+                return loss
+        
+        # Step with closure for optimizers that need it (like HVP)
+        loss = optimizer.step(closure)
+        
+        if args.wandb and not tuning:
+            wandb.log({"train_loss": loss.item(), 
+                       "train_step" : train_config["train_step"]})
         if verbose and not tuning \
             and round((t+1)/len(dataloader), 1)-round(t/len(dataloader), 1)>0:
-            line = f"[TRAIN] epoch {epoch+t/len(dataloader):.1f}, train_loss {loss.item():.4f}"
+            line = f"[TRAIN {epoch+t/len(dataloader):.1f}/{args.n_epoches}] train_loss {loss.item():.4f}"
             print(f"{line}")
-        config["train_step"] += 1
-        loss.backward()
-        optimizer.step()
+        train_config["train_step"] += 1
         total_loss += loss.item()
 
     return total_loss / t
 
 @torch.no_grad
-def eval_step(model, dataloader, loss_fn, device, config, validation=True):
+def eval_step(model, dataloader, loss_fn, device, args, validation=True): # + optimizer_name
     model.eval()
     total_loss = 0
     total_true = np.array([])
@@ -47,8 +62,9 @@ def eval_step(model, dataloader, loss_fn, device, config, validation=True):
         loss = losses.mean()
         total_loss += loss.item()
 
+
     prefix = "val" if validation else "test"
-    if config["task"] in ["Cifar10"]:
+    if args.dataset in ["cifar10"]:
         average = 'weighted' if len(np.unique(total_true)) > 2 else 'binary'
         f1 = f1_score(total_true, total_pred, average=average)
         precision = precision_score(total_true, total_pred, zero_division=0.0, average=average)
@@ -68,26 +84,27 @@ def eval_step(model, dataloader, loss_fn, device, config, validation=True):
     return results
 
 def train(model, optimizer, train_dataloader, val_dataloader, 
-          test_dataloader, loss_fn, device, config, tuning=False, verbose=False):
-    config["train_step"], config["val_step"], config["test_step"] = 0, 0, 0
-    if "n_epoches_tune" not in config: config["n_epoches_tune"] = config["n_epoches"]
-    n_epoches = config['n_epoches_tune'] if tuning else config['n_epoches']
-    e_list = range(n_epoches) if tuning else tqdm(range(n_epoches))
+          test_dataloader, loss_fn, device, args, tuning=False, verbose=False):
+    train_config = {}
+    train_config["train_step"] = 0
+    n_epoches = args.n_epoches_tune if tuning else args.n_epoches
+    e_list = range(n_epoches) if tuning or args.verbose else tqdm(range(n_epoches))
     val_metrics = defaultdict(list)
     test_metrics = defaultdict(list)
     for e in e_list:
         _ = train_step(
             model, optimizer, train_dataloader, 
-            loss_fn, device, config, tuning=tuning, verbose=verbose
+            loss_fn, device, args, tuning=tuning, verbose=verbose, 
+            train_config=train_config, epoch=e,
         )
         val_results = eval_step(
             model, val_dataloader, loss_fn, 
-            device, config, validation=True
+            device, args, validation=True
         )
                 
         test_results = eval_step(
             model, test_dataloader, loss_fn, 
-            device, config, validation=False
+            device, args, validation=False
         )
         
         for key in val_results.keys():
@@ -95,18 +112,18 @@ def train(model, optimizer, train_dataloader, val_dataloader,
         for key in test_results.keys():
             test_metrics[key].append(test_results[key])
         
-        if config["report_to"] == "wandb" and not tuning:
+        if args.wandb and not tuning:
             wandb_config = val_results | test_results
             wandb_config["epoch"] = e + 1
             wandb.log(wandb_config)
         
         if verbose and not tuning:
-            line = f"[VAL]   epoch {e+1:.1f}, "
+            line = f">>>[VAL  {e+1}/{args.n_epoches}] "
             for key in val_results.keys():
-                line += f"{key.split("_")[1]} {val_results[key]:.4f}, "
+                line += f"{key.split("_")[1]} {val_results[key]:.4f} "
             print(f"{line}")
-            line = f"[TEST]  epoch {e+1:.1f}, "
+            line = f">>>[TEST {e+1}/{args.n_epoches}] "
             for key in test_results.keys():
-                line += f"{key.split("_")[1]} {test_results[key]:.4f}, "
+                line += f"{key.split("_")[1]} {test_results[key]:.4f} "
             print(f"{line}")
     return model, val_metrics, test_metrics
