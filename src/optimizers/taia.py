@@ -133,7 +133,7 @@ class TAIA(torch.optim.Optimizer):
                     buf = state["momentum_buffer"]
                     buf.mul_(momentum).add_(g)
                     if group["nesterov"]:
-                        g = g.add(buf, alpha=momentum)
+                        g = g.add(buf, alpha=momentum) 
                     
                     # if self.A is not None:
                     #     self.A = self.A.to(p.data.device).float()
