@@ -5,8 +5,10 @@ Source: https://github.com/KellerJordan/modded-nanogpt
 
 import os
 
+from numpy import dtype
 import torch
 import torch.distributed as dist
+from typing import Callable
 
 def zeropower_via_newtonschulz5(G, steps=10, eps=1e-7):
     """
@@ -31,7 +33,7 @@ def zeropower_via_newtonschulz5(G, steps=10, eps=1e-7):
     if G.size(0) > G.size(1):
         X = X.T
 
-    return X
+    return X.to(dtype=G.dtype, device=G.device)
 
 
 class TAIA(torch.optim.Optimizer):
@@ -64,18 +66,26 @@ class TAIA(torch.optim.Optimizer):
         adamw_wd=0,
         A = None,
         lmo = "frobenious",
+        precondition_type = "norm",
+        shampoo_momentum = -1,
+        shampoo_eps = -1,
     ):
+        if shampoo_momentum == -1: shampoo_momentum = momentum
+        if shampoo_eps == -1: shampoo_eps = adamw_eps
         defaults = dict(
-            lr=lr,
-            momentum=momentum,
-            nesterov=nesterov,
-            ns_steps=ns_steps,
-            adamw_lr=adamw_lr,
-            adamw_lr_ratio=adamw_lr / lr,
-            adamw_betas=adamw_betas,
-            adamw_eps=adamw_eps,
-            adamw_wd=adamw_wd,
-            lmo=lmo,
+            lr                  =   lr,
+            momentum            =   momentum,
+            nesterov            =   nesterov,
+            ns_steps            =   ns_steps,
+            adamw_lr            =   adamw_lr,
+            adamw_lr_ratio      =   adamw_lr / lr,
+            adamw_betas         =   adamw_betas,
+            adamw_eps           =   adamw_eps,
+            adamw_wd            =   adamw_wd,
+            lmo                 =   lmo,
+            precondition_type   =   precondition_type,
+            shampoo_momentum    =   shampoo_momentum,
+            shampoo_eps         =   shampoo_eps
         )
 
         params = list(taia_params)
@@ -103,16 +113,26 @@ class TAIA(torch.optim.Optimizer):
 
         self.A = A
 
-    def step(self, closure):
-        loss = closure() 
+    def step(self, closure: Callable = None):
+        """
+        Performs a single optimization step.
+
+        Arguments:
+            closure (`Callable`, *optional*): A closure that reevaluates the model and returns the loss.
+        """
+        loss = None
+        if closure is not None:
+            loss = closure()
         for group in self.param_groups:
             ############################
-            #           Muon           #
+            #           TAIA           #
             ############################
 
             params = [p for p in group["params"] if self.state[p]["use_taia"]]
             lr = group["lr"]
             momentum = group["momentum"]
+            shampoo_momentum = group["shampoo_momentum"]
+            shampoo_eps = group["shampoo_eps"]
 
             # generate weight updates in distributed fashion
             total_params = sum(p.numel() for p in params)
@@ -130,26 +150,53 @@ class TAIA(torch.optim.Optimizer):
                     state = self.state[p]
                     if "momentum_buffer" not in state:
                         state["momentum_buffer"] = torch.zeros_like(g)
+                    if "prec_L" not in state and group["precondition_type"] == "fisher":
+                        # state["prec_L"] = shampoo_eps * torch.eye(g.size(0), device=g.device)
+                        # state["prec_R"] = shampoo_eps * torch.eye(g.size(1), device=g.device)
+                        state["prec_L"] = torch.zeros(g.size(0), g.size(0), device=g.device)
+                        state["prec_R"] = torch.zeros(g.size(1), g.size(1), device=g.device)
                     buf = state["momentum_buffer"]
                     buf.mul_(momentum).add_(g)
+                    if group["precondition_type"] == "fisher":
+                        H_L = state["prec_L"].clone()
+                        H_R = state["prec_R"].clone()
+                        # print(H_R)
+                        state["prec_L"].add_(g @ g.T)
+                        state["prec_R"].add_(g.T @ g)
+
                     if group["nesterov"]:
                         g = g.add(buf, alpha=momentum) 
                     
-                    # if self.A is not None:
-                    #     self.A = self.A.to(p.data.device).float()
-                    #     print("A", g @ self.A)
-                    # else:
-                    #     print("G", g)
-                    # raise ValueError("AAAAA")
-                    B = g.norm(dim=0, keepdim=True)
-                    B = torch.where(B == 0, 1e-20, B)
-                    g /= B
+                    if group["precondition_type"] == "norm":
+                        L = g.norm(dim=0, keepdim=True)
+                        L = torch.where(L == 0, 1e-8, L)
+                        g /= L
+                    elif group["precondition_type"] == "fisher":
+                        # L = torch.linalg.cholesky(H_L, upper=True)
+                        # R = torch.linalg.cholesky(H_R, upper=False)
+                        # L_inv = torch.linalg.inv(L).to(dtype=g.dtype, device=g.device)
+                        # R_inv = torch.linalg.inv(R).to(dtype=g.dtype, device=g.device)
+                        U_L, sigma_L, _ = torch.linalg.svd(H_L)
+                        U_R, sigma_R, _ = torch.linalg.svd(H_R)
+                        for i in range(sigma_L.size(0)):
+                            sigma_L[i] = 1./sigma_L[i] if sigma_L[i] > 1e-10 else 0
+                        for i in range(sigma_R.size(0)):
+                            sigma_R[i] = 1./sigma_R[i] if sigma_R[i] > 1e-10 else 0
+                        L_inv =  U_L @ torch.diag(sigma_L**1/8)
+                        R_inv = torch.diag(sigma_R**1/8) @ U_R.T
+                        g = L_inv.T @ g @ R_inv.T
+
+                    
                     if group["lmo"] == "spectral":
                         g = zeropower_via_newtonschulz5(g, steps=group["ns_steps"],
                                                         eps=group["adamw_eps"])
-                    g /= B
+                        g *= max(1, g.size(0) / g.size(1)) ** 0.5
+                
+                    if group["precondition_type"] == "norm":
+                        g /= L
+                    elif group["precondition_type"] == "fisher":
+                        g = L_inv @ g @ R_inv
 
-                    g *= max(1, g.size(0) / g.size(1)) ** 0.5
                     updates_flat[curr_idx : curr_idx + p.numel()] = g.flatten()
                 curr_idx += p.numel()
 

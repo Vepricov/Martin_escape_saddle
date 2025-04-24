@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_svmlight_file, make_classification
 
 from torch_optimizer import Shampoo
-from optimizers import soap, adamw_sania, muon, taia
+from optimizers import soap, adam_sania, muon, taia
 from optimizers.diag_hvp import DiagonalPreconditionedOptimizer
 
 import utils
@@ -104,7 +104,8 @@ def libsvm_prepocess(args):
         A, _ = np.linalg.qr(B.T @ B)
         X = X @ A
     
-    X = torch.tensor(X, dtype=torch.float32)
+    # X = torch.tensor(X, dtype=torch.float32)
+    X = torch.tensor(X)
     y = torch.tensor(y, dtype=X.dtype)
 
     ds = TensorDataset(X, y)
@@ -192,7 +193,7 @@ def get_problem(args):
             weight_decay = args.weight_decay,
         )
     elif args.optimizer == "adam-sania":
-        optimizer = adamw_sania.AdamW_SANIA(
+        optimizer = adam_sania.AdamSania(
             params       = model.parameters(), 
             lr           = args.lr, 
             betas        = (args.beta1, args.beta2),
@@ -210,15 +211,23 @@ def get_problem(args):
             ns_steps     = args.ns_steps,
         )
     elif args.optimizer == "taia":
+        taia_params, adamw_params = [], []
+        for i, param in enumerate(model.parameters()):
+            if i == 0:
+                taia_params.append(param)
+            else:
+                adamw_params.append(param)
         optimizer = taia.TAIA(
-            taia_params  = list(model.parameters()), 
-            lr           = args.lr, 
-            adamw_betas  = (args.beta1, args.beta2),
-            adamw_eps    = args.eps, 
-            adamw_wd     = args.weight_decay,
-            momentum     = args.momentum,
-            ns_steps     = args.ns_steps,
-            lmo          = args.lmo,
+            taia_params       = taia_params, 
+            adamw_params      = adamw_params,
+            lr                = args.lr, 
+            adamw_betas       = (args.beta1, args.beta2),
+            adamw_eps         = args.eps, 
+            adamw_wd          = args.weight_decay,
+            momentum          = args.momentum,
+            ns_steps          = args.ns_steps,
+            lmo               = args.lmo,
+            precondition_type = args.precondition_type,
             A = model.A,
         )
     elif args.optimizer == "diag-hvp":

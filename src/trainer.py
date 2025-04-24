@@ -14,25 +14,31 @@ def train_step(model, optimizer, dataloader, loss_fn, device, args,
     for t, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.type(torch.LongTensor).to(device)
         
-        def closure():
-            if hasattr(closure, 'has_been_called') and closure.has_been_called:
-                # Don't zero_grad on subsequent calls to preserve computational graph
-                preds = model(X).to(device)
-                losses = loss_fn(preds, y)
-                loss = losses.mean().to(device)
-                loss.backward(retain_graph=True)
-                return loss
-            else:
-                optimizer.zero_grad()
-                preds = model(X).to(device)
-                losses = loss_fn(preds, y)
-                loss = losses.mean().to(device)
-                loss.backward(retain_graph=True)
-                closure.has_been_called = True
-                return loss
-        
-        # Step with closure for optimizers that need it (like HVP)
-        loss = optimizer.step(closure)
+        # def closure():
+        #     if hasattr(closure, 'has_been_called') and closure.has_been_called:
+        #         # Don't zero_grad on subsequent calls to preserve computational graph
+        #         preds = model(X).to(device)
+        #         losses = loss_fn(preds, y)
+        #         loss = losses.mean().to(device)
+        #         print(">", loss)
+        #         loss.backward()
+        #         return loss
+        #     else:
+        #         optimizer.zero_grad()
+        #         preds = model(X).to(device)
+        #         losses = loss_fn(preds, y)
+        #         loss = losses.mean().to(device)
+        #         print(">>", loss)
+        #         loss.backward()
+        #         closure.has_been_called = True
+        #         return loss
+        # loss = optimizer.step(closure)
+
+        preds = model(X).to(device)
+        losses = loss_fn(preds, y)
+        loss = losses.mean().to(device)
+        loss.backward()
+        optimizer.step()
         
         if args.wandb and not tuning:
             wandb.log({"train_loss": loss.item(), 

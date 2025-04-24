@@ -1,0 +1,3 @@
+~~~~~~~~~~~ mushrooms_adam-sania__no_bias__scale__n_epoches-1__dtype-float64__tune_runs-40 ~~~~~~~~~~~
+test_accuracy: 0.8608374384236454+-0.0
+test_loss: 0.4916423056915675+-0.0

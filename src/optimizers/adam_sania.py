@@ -4,7 +4,7 @@ import torch.optim as optim
 import warnings
 from typing import Callable
 
-class AdamW_SANIA(optim.Optimizer):
+class AdamSania(optim.Optimizer):
     """
     Implements scale invariant Adam algorithm with weight decay [TODO].
 
@@ -65,7 +65,6 @@ class AdamW_SANIA(optim.Optimizer):
         loss = None
         if closure is not None:
             loss = closure()
-
         for group in self.param_groups:
             for p in group["params"]:
                 if p.grad is None:

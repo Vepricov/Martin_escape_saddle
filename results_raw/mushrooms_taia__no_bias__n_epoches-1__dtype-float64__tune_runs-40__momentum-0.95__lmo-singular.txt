@@ -1,0 +1,3 @@
+~~~~~~~~~~~ mushrooms_taia__no_bias__n_epoches-1__dtype-float64__tune_runs-40__momentum-0.95__lmo-singular ~~~~~~~~~~~
+test_accuracy: 0.9716748768472906+-0.0
+test_loss: 0.3702286291923364+-0.0

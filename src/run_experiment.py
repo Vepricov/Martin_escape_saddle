@@ -45,9 +45,9 @@ def tune_params(args, parser, use_old_tune_params=True):
                                 study_name=f"{tune_name}")
     def tune_function(trial):
         args.lr = trial.suggest_float("lr", 1e-6, 5e0, log=True)
-        if hasattr(args, "weight_decay"):
-            args.weight_decay = trial.suggest_float("weight_decay", 
-                                                    1e-6, 1e-2, log=True)
+        # if hasattr(args, "weight_decay"):
+        #     args.weight_decay = trial.suggest_float("weight_decay", 
+        #                                             1e-6, 1e-2, log=True)
 
         return(run_optimization(args, None, tuning=True, verbose=False))
         
@@ -67,9 +67,12 @@ def main(args, parser):
     os.makedirs(f"./{args.tune_path}", exist_ok=True)
     os.makedirs(f"./{args.data_path}", exist_ok=True)
 
+    torch.set_default_dtype(getattr(torch, args.dtype))
     metrics = defaultdict(list)
     run_name = get_run_name(args, parser, tuning=False)
     if args.tune or args.use_old_tune_params:
+        if "scale" in run_name or "rotation" in run_name:
+            args.use_old_tune_params = True
         if args.use_old_tune_params is False:
             print("~~~~~~~~~~~ TUNING ~~~~~~~~~~~")
         args, tuned_params = tune_params(args, parser, 

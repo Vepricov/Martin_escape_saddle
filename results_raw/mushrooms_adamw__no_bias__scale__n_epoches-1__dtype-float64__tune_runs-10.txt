@@ -1,0 +1,3 @@
+~~~~~~~~~~~ mushrooms_adamw__no_bias__scale__n_epoches-1__dtype-float64__tune_runs-10 ~~~~~~~~~~~
+test_accuracy: 0.75+-0.0
+test_loss: 0.6090164493568625+-0.0

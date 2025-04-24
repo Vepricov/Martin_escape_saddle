@@ -7,6 +7,7 @@ import os
 
 import torch
 import torch.distributed as dist
+from typing import Callable
 
 def zeropower_via_newtonschulz5(G, steps=10, eps=1e-7):
     """
@@ -109,7 +110,16 @@ class Muon(torch.optim.Optimizer):
             self.world_size = 1
             self.rank = 0
 
-    def step(self):
+    def step(self, closure: Callable = None):
+        """
+        Performs a single optimization step.
+
+        Arguments:
+            closure (`Callable`, *optional*): A closure that reevaluates the model and returns the loss.
+        """
+        loss = None
+        if closure is not None:
+            loss = closure()
         for group in self.param_groups:
             ############################
             #           Muon           #
@@ -196,6 +206,8 @@ class Muon(torch.optim.Optimizer):
                 scale = bias_correction1 / bias_correction2**0.5
                 p.data.mul_(1 - lr * weight_decay)
                 p.data.add_(g, alpha=-lr / scale)
+        
+        return loss
 
 
 def separate_params(param_groups):

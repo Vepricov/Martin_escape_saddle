@@ -57,6 +57,8 @@ def parse_args() -> None:
                         help="How many epochs to train")
     parser.add_argument("--eval_runs", default=eval_runs_default, type=int, 
                         help="Number of re-training model with diffirent seeds")
+    parser.add_argument("--dtype", default="float32", type=str, 
+                        help="Default type for torch")                 
 
     ### Tuning Arguments
     parser.add_argument("--tune", action="store_true", 
@@ -87,7 +89,7 @@ def parse_args() -> None:
     ### Otimizer Arguments
     parser.add_argument("--lr", default=None, type=float,
                         help="learning rate") # tuneed param
-    parser.add_argument("--weight_decay", default=None, type=float,
+    parser.add_argument("--weight_decay", default=1e-6, type=float,
                         help="weight decay") # tuneed param
     if args1.optimizer not in ["shampoo", "sgd"]:
         parser.add_argument("--beta1", default=0.9, type=float,
@@ -112,7 +114,11 @@ def parse_args() -> None:
                             help="Number of the NS steps algo")
     if args1.optimizer in ["taia"]:
         parser.add_argument("--lmo", default="frobenious", type=str,
+                            choices=["frobenious", "spectral"],
                             help="LMO type for TAIA optimizer")
+        parser.add_argument("--precondition_type", default="norm", type=str,
+                            choices=["norm", "fisher"],
+                            help="Preconditioning type for TAIA optimizer")
     
     args, unparced_args = parser.parse_known_args()
     if len(unparced_args) > 0:

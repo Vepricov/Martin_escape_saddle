@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 clear
-for optimizer in taia
+for optimizer in adamw
 do
     for transform in "" "--scale"
     do
-        CUDA_VISIBLE_DEVICES=7 python ./src/run_experiment.py \
+        CUDA_VISIBLE_DEVICES=3 python ./src/run_experiment.py \
             --dataset mushrooms \
             --eval_runs 1 \
             --n_epoches 1 \
@@ -13,9 +13,11 @@ do
             --hidden_dim 10 \
             $transform \
             --no_bias \
+            --tune \
             --lmo frobenious \
-            --use_old_tune_params \
+            --precondition_type fisher \
             --momentum 0 \
-            --wandb # 
+            --dtype float64 \
+            # --wandb # --use_old_tune_params \
     done
 done

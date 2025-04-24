@@ -72,7 +72,7 @@ def get_run_name(args, parser, tuning=False):
         "tune", "use_old_tune_params", "eval_runs", "augment"
     ]
     ignore_args_tuning = [
-        "n_epoches", "lr", "weight_decay", "scale", "rotate", "scale_bound",
+        "n_epoches", "lr", "weight_decay", "rotate", "scale_bound",
         "weight_init", "ns_steps"
     ]
     # Get the default values
